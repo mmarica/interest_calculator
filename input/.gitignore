@@ -1,0 +1,3 @@
+# put transaction csv files from your bank here
+# cp /mnt/c/Users/mma/Desktop/*.csv input/
+*.csv
