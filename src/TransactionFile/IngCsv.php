@@ -48,10 +48,14 @@ class IngCsv extends AbstractFileReader
         $date = $this->extractDateTime($line[0]);
 
         $interestString = $line[6];
-        $interest = '';
+        // hacky conversion from romanian to english number decimals format
+        // should find a cleaner way to do it at some point
+        $interest = (float)str_replace(',', '.', $interestString);
 
-
-        return [$date, $interest];
+        return [
+            'date' => $date,
+            'interest' => $interest,
+        ];
     }
 
     private function extractDateTime(string $dateString): DateTimeImmutable

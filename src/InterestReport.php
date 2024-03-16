@@ -19,16 +19,26 @@ class InterestReport
     public function generate(string $inputFolder): void
     {
         $files = FileSystem::findByExtension($inputFolder, 'csv');
-        var_dump(FileSystem::findByExtension($inputFolder, 'csv'));
 
-        $filesData = [];
+        $totalInterest = 0;
         foreach ($files as $filename) {
+            echo "$filename\n" . str_repeat('-', strlen($filename)) . "\n";
+
             $fileType = $this->getFileType($filename);
             $fullFilename = $inputFolder . '/' . $filename;
-            $filesData[$filename] = $this->fileReaders[$fileType]->getInterestData($fullFilename);
+            $fileData = $this->fileReaders[$fileType]->getInterestData($fullFilename);
+
+            $fileInterest = 0;
+            foreach ($fileData as $transaction) {
+                echo $transaction['date']->format('Y-m-d') . ': ' . $transaction['interest'] . "\n";
+                $fileInterest += $transaction['interest'];
+            }
+
+            echo "File total: $fileInterest\n\n";
+            $totalInterest += $fileInterest;
         }
 
-        print_r($filesData);
+        echo "GRAND TOTAL: $totalInterest\n";
     }
 
     private function getFileType(string $filename): string
