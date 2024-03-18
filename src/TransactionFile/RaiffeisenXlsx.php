@@ -11,6 +11,8 @@ class RaiffeisenXlsx extends AbstractFileReader
     public const string FILE_PATTERN = 'Raiffeisen_*.XLSX';
 
     private const string WORKSHEET = 'Pagina 1';
+    private const string COL_DOBANDA = 'PLATA AUTOMATA DOB.';
+    private const string COL_IMPOZIT = 'IMPOZIT RETINUT';
 
     public function isFileThisType(string $filename): bool
     {
@@ -27,18 +29,16 @@ class RaiffeisenXlsx extends AbstractFileReader
 
         $xls = $reader->load($fullFilename)->getActiveSheet();
         foreach ($xls->toArray() as $line) {
-            if ($line[11] == 'PLATA AUTOMATA DOB.') {
-                $date = $this->extractDateTime($line[1]);
-                $interest = (float)$line[3];
-                $interestData[] = [
-                    'date' => $date,
-                    'interest' => $interest,
-                ];
-            }
+            $action = $line[11];
+            if (in_array($action, [self::COL_DOBANDA, self::COL_IMPOZIT])) {
+                $date = $this->extractDate('d/m/Y', $line[1]);
 
-            if ($line[11] == 'IMPOZIT RETINUT') {
-                $date = $this->extractDateTime($line[1]);
-                $interest = -(float)$line[2];
+                if ($action == self::COL_IMPOZIT) {
+                    $interest = -$this->extractAmount($line[2]);
+                } else {
+                    $interest = $this->extractAmount($line[3]);
+                }
+
                 $interestData[] = [
                     'date' => $date,
                     'interest' => $interest,
@@ -47,19 +47,5 @@ class RaiffeisenXlsx extends AbstractFileReader
         }
 
         return $interestData;
-    }
-
-    private function extractDateTime(string $dateString): DateTimeImmutable
-    {
-        $date = DateTimeImmutable::createFromFormat('m/d/Y', $dateString);
-        if ($date !== false) {
-            return $date;
-        }
-
-        if ($date === false) {
-            throw new Exception("Invalid value found for date field: '$dateString'.");
-        }
-
-        return $date;
     }
 }

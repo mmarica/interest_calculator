@@ -2,13 +2,15 @@
 
 namespace Mma\Interest\TransactionFile;
 
-use DateTimeImmutable;
 use Exception;
 
 class RaiffeisenPdf extends AbstractFileReader
 {
     public const string FILE_TYPE = 'raiffeisen_pdf';
     public const string FILE_PATTERN = 'Raiffeisen_*.PDF';
+
+    private const string COL_DOBANDA = 'plata dobanda';
+    private const string COL_IMPOZIT = 'impozit pe dobanda';
 
     public function isFileThisType(string $filename): bool
     {
@@ -44,18 +46,17 @@ class RaiffeisenPdf extends AbstractFileReader
             foreach ($matches as $line) {
                 $action = trim($line[3]);
 
-                if ($action == 'plata dobanda') {
-                    print_r($line);
-                    $interestData[] = [
-                        'date' => $this->extractDateTime($line[2]),
-                        'interest' => $this->extractAmount($line[4]),
-                    ];
-                }
+                if (in_array($action, [self::COL_DOBANDA, self::COL_IMPOZIT])) {
+                    $date = $this->extractDate('d.m.Y', $line[2]);
+                    $interest = $this->extractAmount($line[4]);
 
-                if ($action == 'impozit pe dobanda') {
+                    if ($action == self::COL_IMPOZIT) {
+                        $interest = -$interest;
+                    }
+
                     $interestData[] = [
-                        'date' => $this->extractDateTime($line[2]),
-                        'interest' => -$this->extractAmount($line[4]),
+                        'date' => $date,
+                        'interest' => $interest,
                     ];
                 }
             }
@@ -64,25 +65,5 @@ class RaiffeisenPdf extends AbstractFileReader
         }
 
         return $interestData;
-    }
-
-    private function extractDateTime(string $dateString): DateTimeImmutable
-    {
-        $date = DateTimeImmutable::createFromFormat('d.m.Y', $dateString);
-        if ($date !== false) {
-            return $date;
-        }
-
-        if ($date === false) {
-            throw new Exception("Invalid value found for date field: '$dateString'.");
-        }
-
-        return $date;
-    }
-
-    private function extractAmount(string $roAmount): string
-    {
-        $amount = str_replace(',', '', $roAmount);
-        return (float)$amount;
     }
 }

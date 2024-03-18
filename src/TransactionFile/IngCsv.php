@@ -36,31 +36,18 @@ class IngCsv extends AbstractFileReader
                     throw new Exception("Invalid format encountered for line #$lineNumber in $fullFilename: " . print_r($line, true) . ".");
                 }
 
-                $interestData[] = $this->decodeInterestLine($line);
+                $interestData[] = [
+                    'date' => $this->decodeDate($line[0]),
+                    'interest' => $this->extractAmount($line[6], '', ','),
+                ];
             }
         } while(true);
 
         $this->closeFile();
-
         return $interestData;
     }
 
-    private function decodeInterestLine(array $line): array
-    {
-        $date = $this->extractDateTime($line[0]);
-
-        $interestString = $line[6];
-        // hacky conversion from romanian to english number decimals format
-        // should find a cleaner way to do it at some point
-        $interest = (float)str_replace(',', '.', $interestString);
-
-        return [
-            'date' => $date,
-            'interest' => $interest,
-        ];
-    }
-
-    private function extractDateTime(string $dateString): DateTimeImmutable
+    private function decodeDate(string $dateString): DateTimeImmutable
     {
         // ugly hack to "translate" months in date
         // should fix using setlocale(LC_TIME,"ro_RO.UTF-8") - could not get it to work yet
@@ -81,16 +68,11 @@ class IngCsv extends AbstractFileReader
             $dateString = str_replace($roMonth, $enMonth, $dateString);
         }
 
-        $date = DateTimeImmutable::createFromFormat('d F Y', $dateString);
-        if ($date !== false) {
-            return $date;
-        }
-
-        // there can be an alternate format in the file, try to match that one too
-        $date = DateTimeImmutable::createFromFormat('d-M-Y', $dateString);
-
-        if ($date === false) {
-            throw new Exception("Invalid value found for date field: '$dateString'.");
+        try {
+            $date = $this->extractDate('d F Y', $dateString);
+        } catch (Exception) {
+            // there can be an alternate format in the file, try to match that one too
+            $date = $this->extractDate('d-M-Y', $dateString);
         }
 
         return $date;
