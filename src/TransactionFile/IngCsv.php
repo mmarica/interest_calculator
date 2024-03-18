@@ -12,7 +12,8 @@ class IngCsv extends AbstractFileReader
 
     public function isFileThisType(string $filename): bool
     {
-        return str_starts_with(strtolower($filename), 'ing_');
+        return str_starts_with($filename, 'ING_') && str_ends_with($filename, '.csv');
+        return str_starts_with(strtolower($filename), 'ING_');
     }
 
     public function getInterestData(string $fullFilename): array
@@ -22,7 +23,7 @@ class IngCsv extends AbstractFileReader
 
         $lineNumber = 0;
         do {
-            $line = $this->readLine();
+            $line = $this->readCsvLine();
             $lineNumber++;
             
             // end of file

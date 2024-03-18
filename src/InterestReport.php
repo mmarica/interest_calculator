@@ -5,6 +5,7 @@ namespace Mma\Interest;
 use Exception;
 use Mma\Interest\TransactionFile\AbstractFileReader;
 use Mma\Interest\TransactionFile\IngCsv;
+use Mma\Interest\TransactionFile\RaiffeisenXlsx;
 
 class InterestReport
 {
@@ -15,6 +16,7 @@ class InterestReport
     {
         $this->registerFileReaders([
             IngCsv::class,
+            RaiffeisenXlsx::class,
         ]);
     }
 

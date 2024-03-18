@@ -2,3 +2,4 @@ This script can be used to compute total interest earned from multiple accounts 
 
 Supported file types:
 - ING csv (RO)
+- Raiffeisen XLSX (RO)

@@ -28,7 +28,7 @@ abstract class AbstractFileReader
         $this->fullFilename = $fullFilename;
     }
 
-    protected function readLine(): ?array
+    protected function readCsvLine(): ?array
     {
         if (is_null($this->fileHandle)) {
             throw new Exception('No file is open when reading a line.');
