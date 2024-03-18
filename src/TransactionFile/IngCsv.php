@@ -8,6 +8,7 @@ use Exception;
 class IngCsv extends AbstractFileReader
 {
     public const string FILE_TYPE = 'ing_csv';
+    public const string FILE_PATTERN = 'ING_*.csv';
 
     public function isFileThisType(string $filename): bool
     {

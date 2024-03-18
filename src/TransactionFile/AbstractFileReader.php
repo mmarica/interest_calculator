@@ -6,8 +6,9 @@ use Exception;
 
 abstract class AbstractFileReader
 {
-    // override with correct value in extending classes
+    // override with correct values in extending classes
     public const string FILE_TYPE = '';
+    public const string FILE_PATTERN = '';
 
     private $fileHandle = null;
     private ?string $fullFilename = null;
