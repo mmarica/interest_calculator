@@ -3,3 +3,11 @@ This script can be used to compute total interest earned from multiple accounts 
 Supported file types:
 - ING csv (RO)
 - Raiffeisen XLSX (RO)
+- Raiffeisen PDF (RO)
+
+It is meant to be used on Ubuntu.
+
+The ```pdftotext``` binary is used in order to parse the PDF files, so you need to install the package that provides it:
+```shell
+sudo apt install poppler-utils
+```
