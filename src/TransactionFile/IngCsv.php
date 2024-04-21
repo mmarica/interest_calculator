@@ -31,6 +31,11 @@ class IngCsv extends AbstractFileReader
                 break;
             }
 
+            // skip incoming payments
+            if (count($line) >= 4 && $line[3] == 'Incasare') {
+                continue;
+            }
+
             if (in_array('Actualizare dobanda', $line)) {
                 if (count($line) != 8 || $line[3] != 'Actualizare dobanda') {
                     throw new Exception("[1] Invalid format encountered for line #$lineNumber in $fullFilename: " . print_r($line, true) . ".");
@@ -40,6 +45,8 @@ class IngCsv extends AbstractFileReader
                     'date' => $this->decodeDate($line[0]),
                     'interest' => $this->extractAmount($line[6], '.', ','),
                 ];
+
+                continue;
             }
 
             if (in_array('Dobanda aferenta depozitului', $line)) {
@@ -51,6 +58,63 @@ class IngCsv extends AbstractFileReader
                     'date' => $this->decodeDate($line[0]),
                     'interest' => $this->extractAmount($line[6], '.', ','),
                 ];
+
+                continue;
+            }
+
+            // safeguard for unknown operations
+            if (count($line) >= 4 && strlen($line[3])) {
+                // ignore lines with known values in "operation" column
+                $excludeStrings = [
+                    'Detalii tranzactie',
+                    "Transfer Home'Bank",
+                    'Taxe si comisioane',
+                    'Lichidare depozit',
+                    'Cumparare POS',
+                    'Plata debit direct',
+                    'Retragere numerar',
+                    'Incasare via card',
+                    'Cumparare POS - stornare',
+                ];
+                if (in_array($line[3], $excludeStrings)) {
+                    continue;
+                }
+
+                // ignore lines that start with known values in "operation" column
+                $excludeStringStarts = [
+                    'Referinta: ',
+                    'Beneficiar: ',
+                    'In contul: ',
+                    'Principal: ',
+                    'Taxa lunara serviciu Alerte: ',
+                    'Impozit pe dobanda: ',
+                    'Banca: ',
+                    'Detalii: ',
+                    'Ordonator: ',
+                    'Din contul: ',
+                    'Nr. card: ',
+                    'Terminal: ',
+                    'Autorizare: ',
+                    'Data: ',
+                    'Suma: ',
+                    'Suma transmisa spre decontare: ',
+                    "Home'Bank taxa lunara de utilizare cu digipass: ",
+                    " REFUND ",
+                    "Cod Fiscal Platitor: ",
+                    "Comision emitere card livrat prin curier: ",
+                ];
+                foreach ($excludeStringStarts as $excludeStringStart) {
+                    if (str_starts_with($line[3], $excludeStringStart)) {
+                        continue 2;
+                    }
+                }
+
+                // phone number
+                if (is_numeric($line[3]) && round($line[3] * 1) == $line[3]) {
+                    continue;
+                }
+
+                throw new Exception("[3] Invalid format encountered for line #$lineNumber in $fullFilename: " . print_r($line, true) . ".");
             }
         } while(true);
 
