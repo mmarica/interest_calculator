@@ -33,12 +33,23 @@ class IngCsv extends AbstractFileReader
 
             if (in_array('Actualizare dobanda', $line)) {
                 if (count($line) != 8 || $line[3] != 'Actualizare dobanda') {
-                    throw new Exception("Invalid format encountered for line #$lineNumber in $fullFilename: " . print_r($line, true) . ".");
+                    throw new Exception("[1] Invalid format encountered for line #$lineNumber in $fullFilename: " . print_r($line, true) . ".");
                 }
 
                 $interestData[] = [
                     'date' => $this->decodeDate($line[0]),
-                    'interest' => $this->extractAmount($line[6], '', ','),
+                    'interest' => $this->extractAmount($line[6], '.', ','),
+                ];
+            }
+
+            if (in_array('Dobanda aferenta depozitului', $line)) {
+                if (count($line) != 8 || $line[3] != 'Dobanda aferenta depozitului') {
+                    throw new Exception("[2] Invalid format encountered for line #$lineNumber in $fullFilename: " . print_r($line, true) . ".");
+                }
+
+                $interestData[] = [
+                    'date' => $this->decodeDate($line[0]),
+                    'interest' => $this->extractAmount($line[6], '.', ','),
                 ];
             }
         } while(true);
