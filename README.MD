@@ -7,7 +7,22 @@ Supported file types:
 
 It is meant to be used on Ubuntu.
 
+Install necessary PHP extensions:
+```
+sudo apt install php-gd php-zip
+```
+
 The ```pdftotext``` binary is used in order to parse the PDF files, so you need to install the package that provides it:
 ```shell
 sudo apt install poppler-utils
+```
+
+Install composer packages:
+```
+composer install
+```
+
+Execute the script:
+```
+php cli/main.php
 ```
