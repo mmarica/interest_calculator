@@ -75,6 +75,7 @@ class IngCsv extends AbstractFileReader
                     'Retragere numerar',
                     'Incasare via card',
                     'Cumparare POS - stornare',
+                    'Constituire depozit',
                 ];
                 if (in_array($line[3], $excludeStrings)) {
                     continue;
@@ -82,26 +83,31 @@ class IngCsv extends AbstractFileReader
 
                 // ignore lines that start with known values in "operation" column
                 $excludeStringStarts = [
-                    'Referinta: ',
-                    'Beneficiar: ',
-                    'In contul: ',
-                    'Principal: ',
-                    'Taxa lunara serviciu Alerte: ',
-                    'Impozit pe dobanda: ',
-                    'Banca: ',
-                    'Detalii: ',
-                    'Ordonator: ',
-                    'Din contul: ',
-                    'Nr. card: ',
-                    'Terminal: ',
-                    'Autorizare: ',
-                    'Data: ',
-                    'Suma: ',
-                    'Suma transmisa spre decontare: ',
-                    "Home'Bank taxa lunara de utilizare cu digipass: ",
+                    'Data autorizarii:',
+                    'Numar autorizare:',
+                    'Data finalizarii(decontarii):',
+                    'Rata ING:',
+                    'Referinta:',
+                    'Beneficiar:',
+                    'In contul:',
+                    'Principal:',
+                    'Taxa lunara serviciu Alerte:',
+                    'Impozit pe dobanda:',
+                    'Banca:',
+                    'Detalii:',
+                    'Ordonator:',
+                    'Din contul:',
+                    'Numar card:',
+                    'Nr. card:',
+                    'Terminal:',
+                    'Autorizare:',
+                    'Data:',
+                    'Suma:',
+                    'Suma transmisa spre decontare:',
+                    "Home'Bank taxa lunara de utilizare cu digipass:",
                     " REFUND ",
-                    "Cod Fiscal Platitor: ",
-                    "Comision emitere card livrat prin curier: ",
+                    "Cod Fiscal Platitor:",
+                    "Comision emitere card livrat prin curier:",
                 ];
                 foreach ($excludeStringStarts as $excludeStringStart) {
                     if (str_starts_with($line[3], $excludeStringStart)) {
